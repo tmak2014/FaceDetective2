@@ -1,4 +1,4 @@
-package src;
+package src.src;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -35,6 +35,10 @@ public class FdActivity extends javax.swing.JFrame {
     private static final int TM_CCORR = 4;
     private static final int TM_CCORR_NORMED = 5;
 
+	private Point blackeye_center=null;
+	private Point blackeye_center_pre=null;
+	private double diff_x;
+	private double diff_y;
 
     private int learn_frames = 0;
     private Mat teplateR;
@@ -230,10 +234,19 @@ public class FdActivity extends javax.swing.JFrame {
         if (false) {
         	Imgproc.rectangle(mRgba, matchLoc_tx, matchLoc_ty, new Scalar(255, 255, 0, 255));
         } else {
+        	
+      //  	if(blackeye_center_pre!=blackeye_center) {
+      //  		blackeye_center_pre=blackeye_center;
+      //  	}
+        	
         	Point pt = new Point();
 //        	Point pt = lr == 0 ? centerR : centerL;
         	pt.x = matchLoc_tx.x + (matchLoc_ty.x - matchLoc_tx.x)/2;
         	pt.y = matchLoc_tx.y + (matchLoc_ty.y - matchLoc_tx.y)/2;
+        	
+        	//黒目の中心座標がローカル変数にしかないのでクラス変数に保存する
+        	blackeye_center = pt;
+        	
 //        	if (pt.x < area.width / 4 || pt.x > (area.width / 4) * 3 ||
 //        		pt.y < area.height / 4 || pt.y > (area.height / 4) * 3) {
 //
@@ -304,6 +317,9 @@ public class FdActivity extends javax.swing.JFrame {
 	int fps = 0;
 	int cnt = 0;
 	int oldcnt = 0;
+	
+	int direction = 5;
+	
 	final double f = (1000 /Core.getTickFrequency());
 	double startTime,nowTime, diffTime;
 	double[] mData;
@@ -342,6 +358,18 @@ public class FdActivity extends javax.swing.JFrame {
                                }
                         	}
 
+                            //if(blackeye_center_pre!=null) {
+                            	
+                       //     	diff_x=blackeye_center.x-blackeye_center_pre.x;
+                      //      	diff_y=blackeye_center.y-blackeye_center_pre.y;
+                            	
+                       //     	if(diff_x>50) direction = 6;
+                            	
+                      //      }
+                            
+                            
+                            
+                            
                             nowTime = Core.getTickCount();
                             diffTime = (int)((nowTime- startTime)*f);
 
@@ -355,6 +383,8 @@ public class FdActivity extends javax.swing.JFrame {
                             g.drawString(String.valueOf(fps), 20, 20);
                             g.drawString(String.valueOf(value1), 20, 40);
                             g.drawString(String.valueOf(value2), 20, 60);
+                            g.drawString(String.valueOf(direction), 20, 80);
+                            g.drawString(String.valueOf(cnt), 20, 100);
                             cnt++;
                         } catch (Exception ex) {
                             System.out.printf("Error %s", ex.toString());
@@ -543,6 +573,7 @@ public class FdActivity extends javax.swing.JFrame {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
+        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
