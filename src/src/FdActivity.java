@@ -44,25 +44,24 @@ public class FdActivity extends javax.swing.JFrame {
 
     private Point mBlackEyeCenter = null;
     private Point mSettingCenter = null;
-    private double mDiffX;
-//    private double diff_y;
+    private double mDiffX = 0;
     private double mDiffY = 0;
-    private List<BufferedImage> mReadImages = new ArrayList<>();
+    private List<Mat> mArrowImages = new ArrayList<>();
     
     /**
      * 1 2 3
      * 4 5 6
      * 7 8 9
      */
-    private static final int DIRECTION_UP_RIGHT        = 1;
-    private static final int DIRECTION_UP             = 2;
-    private static final int DIRECTION_UP_LEFT         = 3;
-    private static final int DIRECTION_RIGHT         = 4;
-    private static final int DIRECTION_CENTER         = 5;
-    private static final int DIRECTION_LEFT         = 6;
-    private static final int DIRECTION_DOWN_RIGHT     = 7;
-    private static final int DIRECTION_DOWN         = 8;
-    private static final int DIRECTION_DOWN_LEFT     = 9;
+    private static final int DIRECTION_UP_RIGHT         = 1;
+    private static final int DIRECTION_UP               = 2;
+    private static final int DIRECTION_UP_LEFT          = 3;
+    private static final int DIRECTION_RIGHT            = 4;
+    private static final int DIRECTION_CENTER           = 5;
+    private static final int DIRECTION_LEFT             = 6;
+    private static final int DIRECTION_DOWN_RIGHT       = 7;
+    private static final int DIRECTION_DOWN             = 8;
+    private static final int DIRECTION_DOWN_LEFT        = 9;
     private int mEyeDirection = DIRECTION_CENTER;
     
     private int learn_frames = 0;
@@ -83,6 +82,9 @@ public class FdActivity extends javax.swing.JFrame {
     private Mat mZoomWindow;
     private Mat mZoomWindow2;
 
+    // matrix for showing direction
+    private Mat mDirectionWindow;
+
     private Mat                    mRgba = new Mat();
     private Mat                    mGray = new Mat();
 
@@ -100,6 +102,7 @@ public class FdActivity extends javax.swing.JFrame {
         mRgba.release();
         mZoomWindow.release();
         mZoomWindow2.release();
+        mDirectionWindow.release();
     }
 
     public Mat onCameraFrame() {
@@ -117,6 +120,9 @@ public class FdActivity extends javax.swing.JFrame {
 
         if (mZoomWindow == null || mZoomWindow2 == null)
             CreateAuxiliaryMats();
+
+        if (mDirectionWindow == null)
+            CreateDirectionMat();
 
         MatOfRect faces = new MatOfRect();
 
@@ -183,7 +189,8 @@ public class FdActivity extends javax.swing.JFrame {
             Imgproc.resize(mRgba.submat(eyearea_right), mZoomWindow,
                     mZoomWindow.size());
 
-
+            Mat arrowImage = mArrowImages.get(mEyeDirection -1);
+            Imgproc.resize(arrowImage, mDirectionWindow, mDirectionWindow.size());
         }
 
         return mRgba;
@@ -209,11 +216,24 @@ public class FdActivity extends javax.swing.JFrame {
         }
 
     }
+    
+    private void CreateDirectionMat() {
+        if (mGray.empty())
+            return;
+
+        int rows = mGray.rows();
+        int cols = mGray.cols();
+
+        if (mDirectionWindow == null) {
+            mDirectionWindow = mRgba.submat(rows - 100, rows, 0, 100);
+        }
+
+    }
 
     private Point centerR;
     private Point centerL;
     private void match_eye(Rect area, Mat mTemplate, int type, int lr) {
-        System.out.println("### match_eye()");
+//        System.out.println("### match_eye()");
         Point matchLoc;
         Mat mROI = mGray.submat(area);
         int result_cols = mROI.cols() - mTemplate.cols() + 1;
@@ -268,12 +288,15 @@ public class FdActivity extends javax.swing.JFrame {
             pt.x = matchLoc_tx.x + (matchLoc_ty.x - matchLoc_tx.x)/2;
             pt.y = matchLoc_tx.y + (matchLoc_ty.y - matchLoc_tx.y)/2;
             
-            // çïñ⁄ÇÃíÜêSç¿ïWÇêèéûäiî[
-            mBlackEyeCenter = pt;
-            
-            // èââÒÇæÇØäiî[
-            if (mSettingCenter == null) {
-                mSettingCenter = pt;
+            // Ç∆ÇËÇ†Ç¶Ç∏âEñ⁄ÇÃÇ›
+            if (lr == 0) {
+                // çïñ⁄ÇÃíÜêSç¿ïWÇêèéûäiî[
+                mBlackEyeCenter = pt;
+                
+                // èââÒÇæÇØäiî[
+                if (mSettingCenter == null) {
+                    mSettingCenter = pt;
+                }
             }
             
 //            if (pt.x < area.width / 4 || pt.x > (area.width / 4) * 3 ||
@@ -331,9 +354,13 @@ public class FdActivity extends javax.swing.JFrame {
 
     public void resetLearnFrames()
     {
+        System.out.println("### resetLearnFrames()");
         learn_frames = 0;
         mSettingCenter = null;
         mBlackEyeCenter = null;
+        mDiffX = 0;
+        mDiffY = 0;
+        mEyeDirection = DIRECTION_CENTER;
     }
     
     private DaemonThread myThread = null;
@@ -379,70 +406,79 @@ public class FdActivity extends javax.swing.JFrame {
                             Imgcodecs.imencode(".bmp", frame, mem);
                             Image im = ImageIO.read(new ByteArrayInputStream(mem.toArray()));
                             BufferedImage buff = (BufferedImage) im;
-                            if (g.drawImage(buff, 0, 0, getWidth(), getHeight()-150 , 0, 0, buff.getWidth(), buff.getHeight(), null)) {
+//                            if (g.drawImage(buff, 0, 0, getWidth(), getHeight()-150 , 0, 0, buff.getWidth(), buff.getHeight(), null)) {
+                            if (g.drawImage(buff, 0, 0, getWidth(), getHeight()-100 , 0, 0, buff.getWidth(), buff.getHeight(), null)) {
                                if (runnable == false) {
                                    System.out.println("Paused ..... ");
                                    this.wait();
                                }
                             }
-                            
-                            int x_threshold = 50;
-                            int y_threshold = 50;
+
+                            //TODO Adjust the values
+                            int x_threshold = 10;
+                            int y_threshold = 10;
+                            int x_lost = 100;
+                            int y_lost = 100;
+
                             if(mSettingCenter != null && mBlackEyeCenter != null) {
                                 mDiffX = mBlackEyeCenter.x - mSettingCenter.x;
                                 mDiffY = mBlackEyeCenter.y - mSettingCenter.y;
                             }
-                            
-                            if(mDiffX > x_threshold) {
-                                if(mDiffY > y_threshold) {
-                                    mEyeDirection = DIRECTION_DOWN_LEFT;
-                                } else if(mDiffY < -y_threshold) {
-                                    mEyeDirection = DIRECTION_UP_LEFT;
-                                } else {
-                                    mEyeDirection = DIRECTION_LEFT;
-                                }
-                            } else if(mDiffX < -x_threshold) {
-                                if(mDiffY > y_threshold) {
-                                    mEyeDirection = DIRECTION_DOWN_RIGHT;
-                                } else if(mDiffY < -y_threshold) {
-                                    mEyeDirection = DIRECTION_UP_RIGHT;
-                                } else {
-                                    mEyeDirection = DIRECTION_RIGHT;
-                                }
+
+                            if (Math.abs(mDiffX) > x_lost || Math.abs(mDiffY) > y_lost) {
+                                System.out.println("lost... ");
+                                mDiffX = 0;
+                                mDiffY = 0;
+                                mEyeDirection = DIRECTION_CENTER;
+                                resetLearnFrames();
                             } else {
-                                if(mDiffY > y_threshold) {
-                                    mEyeDirection = DIRECTION_DOWN;
-                                } else if(mDiffY < -y_threshold) {
-                                    mEyeDirection = DIRECTION_UP;
+                                if(mDiffX > x_threshold) {
+                                    if(mDiffY > y_threshold) {
+                                        mEyeDirection = DIRECTION_DOWN_LEFT;
+                                    } else if(mDiffY < -y_threshold) {
+                                        mEyeDirection = DIRECTION_UP_LEFT;
+                                    } else {
+                                        mEyeDirection = DIRECTION_LEFT;
+                                    }
+                                } else if(mDiffX < -x_threshold) {
+                                    if(mDiffY > y_threshold) {
+                                        mEyeDirection = DIRECTION_DOWN_RIGHT;
+                                    } else if(mDiffY < -y_threshold) {
+                                        mEyeDirection = DIRECTION_UP_RIGHT;
+                                    } else {
+                                        mEyeDirection = DIRECTION_RIGHT;
+                                    }
                                 } else {
-                                    mEyeDirection = DIRECTION_CENTER;
+                                    if(mDiffY > y_threshold) {
+                                        mEyeDirection = DIRECTION_DOWN;
+                                    } else if(mDiffY < -y_threshold) {
+                                        mEyeDirection = DIRECTION_UP;
+                                    } else {
+                                        mEyeDirection = DIRECTION_CENTER;
+                                    }
                                 }
                             }
-                            
-//                            Graphics directionImage = jPanel_direction.getGraphics();
-//                            directionImage.drawImage(mReadImages.get(mEyeDirection -1), 300, 300, null);
-//                            BufferedImage bf = ImageIO.read(new File("test.png"));
-//                            directionImage.drawImage(bf, bf.getWidth(), bf.getHeight(), null);
 
                             nowTime = Core.getTickCount();
                             diffTime = (int)((nowTime- startTime)*f);
 
                             if (diffTime >= 1000) {
-                             startTime = nowTime;
-                             fps = cnt - oldcnt;
-                             oldcnt = cnt;
+                               startTime = nowTime;
+                               fps = cnt - oldcnt;
+                               oldcnt = cnt;
                             }
 
-                            g.setColor(Color.BLACK);
+                            g.setColor(Color.RED);
                             g.drawString(String.valueOf(fps), 20, 20);
                             g.drawString(String.valueOf(value1), 20, 40);
                             g.drawString(String.valueOf(value2), 20, 60);
 
-                            g.drawString(String.valueOf(mSettingCenter), 20, 80);
-                            g.drawString(String.valueOf(mBlackEyeCenter), 20, 100);
-                            g.drawString(String.valueOf(mDiffX), 20, 120);
-                            g.drawString(String.valueOf(mDiffY), 20, 140);
-                            g.drawString(String.valueOf(mEyeDirection), 20, 160);
+                            g.drawString("mSettingCenter: " + String.valueOf(mSettingCenter), 20, 80);
+                            g.drawString("mBlackEyeCenter: " + String.valueOf(mBlackEyeCenter), 20, 100);
+                            g.drawString("mDiffX: " + String.valueOf(mDiffX), 20, 120);
+                            g.drawString("mDiffY: " + String.valueOf(mDiffY), 20, 140);
+                            g.drawString("mEyeDirection: " +String.valueOf(mEyeDirection), 20, 160);
+
                             cnt++;
                         } catch (Exception ex) {
                             System.out.printf("Error %s", ex.toString());
@@ -461,23 +497,24 @@ public class FdActivity extends javax.swing.JFrame {
         initComponents();
         System.out.println(FdActivity.class.getResource("/haarcascade_frontalface_alt.xml").getPath().substring(1));
         
-        mReadImages = new ArrayList<BufferedImage>();
-        try {
-            // Range is 0-8.
-            mReadImages.add(ImageIO.read(new File("1_up_right.png")));
-            mReadImages.add(ImageIO.read(new File("2_up.png")));
-            mReadImages.add(ImageIO.read(new File("3_up_left.png")));
-            mReadImages.add(ImageIO.read(new File("4_right.png")));
-            mReadImages.add(ImageIO.read(new File("5_center.png")));
-            mReadImages.add(ImageIO.read(new File("6_left.png")));
-            mReadImages.add(ImageIO.read(new File("7_down_right.png")));
-            mReadImages.add(ImageIO.read(new File("8_down.png")));
-            mReadImages.add(ImageIO.read(new File("9_down_left.png")));
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        System.out.println(new File("1_up_right.png").getAbsoluteFile());
+        initImages();
 
+    }
+
+    private void initImages() {
+        // TODO âÊëúÉpÉXÇìKêÿÇ…
+        mArrowImages = new ArrayList<Mat>();
+        // Range is 0-8.
+        mArrowImages.add(Imgcodecs.imread("1_up_right.png"));
+        mArrowImages.add(Imgcodecs.imread("2_up.png"));
+        mArrowImages.add(Imgcodecs.imread("3_up_left.png"));
+        mArrowImages.add(Imgcodecs.imread("4_right.png"));
+        mArrowImages.add(Imgcodecs.imread("5_center.png"));
+        mArrowImages.add(Imgcodecs.imread("6_left.png"));
+        mArrowImages.add(Imgcodecs.imread("7_down_right.png"));
+        mArrowImages.add(Imgcodecs.imread("8_down.png"));
+        mArrowImages.add(Imgcodecs.imread("9_down_left.png"));
+        System.out.println(new File("1_up_right.png").getAbsoluteFile());
     }
 
     /**
