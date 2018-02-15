@@ -1,9 +1,13 @@
 package src;
 
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.MouseInfo;
+import java.awt.PointerInfo;
+import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -96,6 +100,8 @@ public class FdActivity extends javax.swing.JFrame {
 
     double xCenter = -1;
     double yCenter = -1;
+    
+    private final boolean _flag_mouse_control = true;
 
     public void onCameraViewStopped() {
         mGray.release();
@@ -458,6 +464,9 @@ public class FdActivity extends javax.swing.JFrame {
                                     }
                                 }
                             }
+                            if (_flag_mouse_control) {
+                                moveMouse(mEyeDirection);
+                            }
 
                             nowTime = Core.getTickCount();
                             diffTime = (int)((nowTime- startTime)*f);
@@ -487,6 +496,52 @@ public class FdActivity extends javax.swing.JFrame {
                 }
             }
         }
+    }
+
+    private void moveMouse(int direction) throws AWTException {
+//            System.out.println("Number of Mouse Button : " + MouseInfo.getNumberOfButtons());
+
+            PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+            System.out.println("Location of Mouse : " + pointerInfo.getLocation());
+
+            Robot robot = new Robot();
+
+            // ƒ}ƒEƒX‚ðˆÚ“®‚³‚¹‚é
+            int moveDiff = 5;
+            int mousePointX = pointerInfo.getLocation().x;
+            int mousePointY = pointerInfo.getLocation().y;
+            switch (direction) {
+                case DIRECTION_UP_RIGHT:
+                    mousePointX -= moveDiff;
+                    mousePointY -= moveDiff;
+                    break;
+                case DIRECTION_UP: 
+                    mousePointY -= moveDiff;
+                    break;
+                case DIRECTION_UP_LEFT:
+                    mousePointX += moveDiff;
+                    mousePointY -= moveDiff;
+                    break;
+                case DIRECTION_RIGHT:
+                    mousePointX -= moveDiff;
+                    break;
+                case DIRECTION_CENTER: break;
+                case DIRECTION_LEFT:
+                    mousePointX += moveDiff;
+                    break;
+                case DIRECTION_DOWN_RIGHT:
+                    mousePointX -= moveDiff;
+                    mousePointY += moveDiff;
+                    break;
+                case DIRECTION_DOWN: 
+                    mousePointY += moveDiff;
+                    break;
+                case DIRECTION_DOWN_LEFT:
+                    mousePointX += moveDiff;
+                    mousePointY += moveDiff;
+                    break;
+            }
+            robot.mouseMove(mousePointX, mousePointY);
     }
 
 /////////
