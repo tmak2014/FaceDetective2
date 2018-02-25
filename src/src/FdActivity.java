@@ -527,7 +527,6 @@ public class FdActivity extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jPanel_direction = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButtonV1U = new javax.swing.JButton();
@@ -535,7 +534,6 @@ public class FdActivity extends javax.swing.JFrame {
         jButtonV2U = new javax.swing.JButton();
         jButtonV2D = new javax.swing.JButton();
         jButtonLearn = new javax.swing.JButton();
-//        jButtonSetCenter = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -550,20 +548,6 @@ public class FdActivity extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 //            .addGap(0, 376, Short.MAX_VALUE)
             .addGap(0, 600, Short.MAX_VALUE)
-        );
-
-        javax.swing.GroupLayout jPanel_direction_Layout = new javax.swing.GroupLayout(jPanel_direction);
-        jPanel_direction.setLayout(jPanel_direction_Layout);
-        jPanel_direction.setPreferredSize(new Dimension(300, 300));
-        jPanel_direction_Layout.setHorizontalGroup(
-                jPanel_direction_Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGap(0, 0, Short.MAX_VALUE)
-        );
-        
-        jPanel_direction_Layout.setVerticalGroup(
-                jPanel_direction_Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//              .addGap(0, 376, Short.MAX_VALUE)
-                .addGap(0, 600, Short.MAX_VALUE)
         );
 
         jButton1.setText("Start");
@@ -611,20 +595,6 @@ public class FdActivity extends javax.swing.JFrame {
             }
         });
 
-//        jButtonSetCenter.setText("SetCenter");
-//        jButtonSetCenter.addActionListener(new java.awt.event.ActionListener() {
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                setCenter();
-//            }
-//        });
-//        
-//        jButtonPopUp.setText("PopUp");
-//        jButtonPopUp.addActionListener(new java.awt.event.ActionListener() {
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                popUp();
-//            }
-//        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -632,21 +602,14 @@ public class FdActivity extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(24, 24, 24)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-//                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE)
-//                .addComponent(jPanel_direction, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE)
-//                .addComponent(jPanel_direction, 300, 300, 300)
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(100, 100, 100)
                 .addComponent(jButton1)
                 .addComponent(jButton2)
                 .addGap(86, 86, 86)
-//                .addComponent(jButtonSetCenter)
-//                .addGap(86, 86, 86)
                 .addComponent(jButtonLearn)
                 .addGap(86, 86, 86)
-//                .addComponent(jButtonPopUp)
-//                .addGap(86, 86, 86)
                 .addComponent(jButtonV1U)
                 .addComponent(jButtonV1D)
                 .addGap(86, 86, 86)
@@ -659,19 +622,15 @@ public class FdActivity extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                .addComponent(jPanel_direction, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                .addComponent(jPanel_direction, 300, 300, 300)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
                     .addComponent(jButton2)
                     .addComponent(jButtonLearn)
-//                    .addComponent(jButtonSetCenter)
                     .addComponent(jButtonV1U)
                     .addComponent(jButtonV1D)
                     .addComponent(jButtonV2U)
                     .addComponent(jButtonV2D))
-//                .addComponent(jButtonPopUp)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -760,7 +719,6 @@ public class FdActivity extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel_direction;
     
     private javax.swing.JButton jButtonV1U;
     private javax.swing.JButton jButtonV1D;
@@ -769,9 +727,6 @@ public class FdActivity extends javax.swing.JFrame {
     private javax.swing.JButton jButtonV2D;
 
     private javax.swing.JButton jButtonLearn;
-    
-//    private javax.swing.JButton jButtonSetCenter;
-//    private javax.swing.JButton jButtonPopUp;
 
     // End of variables declaration//GEN-END:variables
 }
