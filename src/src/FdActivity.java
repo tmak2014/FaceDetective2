@@ -8,13 +8,10 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -49,6 +46,8 @@ public class FdActivity extends javax.swing.JFrame {
     private double mDiffX = 0;
     private double mDiffY = 0;
     private List<Mat> mArrowImages = new ArrayList<>();
+    
+    private List<Image> mEyePatternImages = new ArrayList<>();
     
     /**
      * 1 2 3
@@ -382,6 +381,7 @@ public class FdActivity extends javax.swing.JFrame {
     double[] mData;
     double mRho;
     Point mPt = new Point();
+    Image eyeImage ;
 
     CascadeClassifier faceDetector = new CascadeClassifier(getClass().getResource("/haarcascade_eye_tree_eyeglasses.xml").getPath().substring(1));
     CascadeClassifier mJavaDetector = new CascadeClassifier(getClass().getResource("/lbpcascade_frontalface.xml").getPath().substring(1));
@@ -407,8 +407,10 @@ public class FdActivity extends javax.swing.JFrame {
 
                             //TODO 画像表示サイズ
                             Graphics myGraphics = myJPanel.getGraphics();
-                            BufferedImage myImage = ImageIO.read(new File("EyePattern.jpg"));
-                            myGraphics.drawImage(myImage, 0, 0, 600, 500 , 0, 0, myImage.getWidth(), myImage.getHeight(), null);
+                            eyeImage = mEyePatternImages.get(mEyeDirection -1);
+
+                            //BufferedImage myImage = ImageIO.read(new File("EyePattern.jpg"));
+                            myGraphics.drawImage(eyeImage, 0, 0, 600, 500 , 0, 0,  960, 720, null);
 
                             Imgcodecs.imencode(".bmp", frame, mem);
                             Image im = ImageIO.read(new ByteArrayInputStream(mem.toArray()));
@@ -523,6 +525,24 @@ public class FdActivity extends javax.swing.JFrame {
         mArrowImages.add(Imgcodecs.imread("8_down.png"));
         mArrowImages.add(Imgcodecs.imread("9_down_left.png"));
         System.out.println(new File("1_up_right.png").getAbsoluteFile());
+        
+        mEyePatternImages=new ArrayList<Image>();
+        try {
+			mEyePatternImages.add(ImageIO.read(new File("1.BMP")));
+
+        mEyePatternImages.add(ImageIO.read(new File("2.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("3.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("4.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("5.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("6.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("7.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("8.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("9.BMP")));
+		} catch (IOException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+        System.out.println(new File("1.BMP").getAbsoluteFile());
     }
 
     /**
