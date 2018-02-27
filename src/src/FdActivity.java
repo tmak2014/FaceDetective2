@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +46,8 @@ public class FdActivity extends javax.swing.JFrame {
     private double mDiffX = 0;
     private double mDiffY = 0;
     private List<Mat> mArrowImages = new ArrayList<>();
+    
+    private List<Image> mEyePatternImages = new ArrayList<>();
     
     /**
      * 1 2 3
@@ -380,6 +381,7 @@ public class FdActivity extends javax.swing.JFrame {
     double[] mData;
     double mRho;
     Point mPt = new Point();
+    Image eyeImage ;
 
     CascadeClassifier faceDetector = new CascadeClassifier(getClass().getResource("/haarcascade_eye_tree_eyeglasses.xml").getPath().substring(1));
     CascadeClassifier mJavaDetector = new CascadeClassifier(getClass().getResource("/lbpcascade_frontalface.xml").getPath().substring(1));
@@ -403,11 +405,19 @@ public class FdActivity extends javax.swing.JFrame {
                             onCameraFrame();
                             Graphics g = jPanel1.getGraphics();
 
+                            //TODO 画像表示サイズ
+                            Graphics myGraphics = myJPanel.getGraphics();
+                            eyeImage = mEyePatternImages.get(mEyeDirection -1);
+
+                            //BufferedImage myImage = ImageIO.read(new File("EyePattern.jpg"));
+                            myGraphics.drawImage(eyeImage, 0, 0, 600, 500 , 0, 0,  960, 720, null);
+
                             Imgcodecs.imencode(".bmp", frame, mem);
                             Image im = ImageIO.read(new ByteArrayInputStream(mem.toArray()));
                             BufferedImage buff = (BufferedImage) im;
 //                            if (g.drawImage(buff, 0, 0, getWidth(), getHeight()-150 , 0, 0, buff.getWidth(), buff.getHeight(), null)) {
-                            if (g.drawImage(buff, 0, 0, getWidth(), getHeight()-100 , 0, 0, buff.getWidth(), buff.getHeight(), null)) {
+                            if (g.drawImage(buff, 0, 0, 1000, 600 , 0, 0, buff.getWidth(), buff.getHeight(), null)) {
+//                            if (g.drawImage(myImage, 0, 0, getWidth(), getHeight()-100 , 0, 0, myImage.getWidth(), myImage.getHeight(), null)) {
                                if (runnable == false) {
                                    System.out.println("Paused ..... ");
                                    this.wait();
@@ -515,6 +525,24 @@ public class FdActivity extends javax.swing.JFrame {
         mArrowImages.add(Imgcodecs.imread("8_down.png"));
         mArrowImages.add(Imgcodecs.imread("9_down_left.png"));
         System.out.println(new File("1_up_right.png").getAbsoluteFile());
+        
+        mEyePatternImages=new ArrayList<Image>();
+        try {
+			mEyePatternImages.add(ImageIO.read(new File("1.BMP")));
+
+        mEyePatternImages.add(ImageIO.read(new File("2.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("3.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("4.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("5.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("6.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("7.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("8.BMP")));
+        mEyePatternImages.add(ImageIO.read(new File("9.BMP")));
+		} catch (IOException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+        System.out.println(new File("1.BMP").getAbsoluteFile());
     }
 
     /**
@@ -527,7 +555,6 @@ public class FdActivity extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jPanel_direction = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButtonV1U = new javax.swing.JButton();
@@ -535,7 +562,8 @@ public class FdActivity extends javax.swing.JFrame {
         jButtonV2U = new javax.swing.JButton();
         jButtonV2D = new javax.swing.JButton();
         jButtonLearn = new javax.swing.JButton();
-//        jButtonSetCenter = new javax.swing.JButton();
+
+        myJPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -552,18 +580,18 @@ public class FdActivity extends javax.swing.JFrame {
             .addGap(0, 600, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout jPanel_direction_Layout = new javax.swing.GroupLayout(jPanel_direction);
-        jPanel_direction.setLayout(jPanel_direction_Layout);
-        jPanel_direction.setPreferredSize(new Dimension(300, 300));
-        jPanel_direction_Layout.setHorizontalGroup(
-                jPanel_direction_Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGap(0, 0, Short.MAX_VALUE)
+// TODO レイアウト指定
+        javax.swing.GroupLayout myJPanelLayout = new javax.swing.GroupLayout(myJPanel);
+        myJPanel.setLayout(myJPanelLayout);
+//        myJPanel.setPreferredSize(new Dimension(100, 100));
+        myJPanelLayout.setHorizontalGroup(
+                myJPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
-        
-        jPanel_direction_Layout.setVerticalGroup(
-                jPanel_direction_Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//              .addGap(0, 376, Short.MAX_VALUE)
-                .addGap(0, 600, Short.MAX_VALUE)
+        myJPanelLayout.setVerticalGroup(
+                myJPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//            .addGap(0, 376, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         jButton1.setText("Start");
@@ -611,42 +639,23 @@ public class FdActivity extends javax.swing.JFrame {
             }
         });
 
-//        jButtonSetCenter.setText("SetCenter");
-//        jButtonSetCenter.addActionListener(new java.awt.event.ActionListener() {
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                setCenter();
-//            }
-//        });
-//        
-//        jButtonPopUp.setText("PopUp");
-//        jButtonPopUp.addActionListener(new java.awt.event.ActionListener() {
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                popUp();
-//            }
-//        });
-
+        // TODO レイアウト調整
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(24, 24, 24)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-//                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE)
-//                .addComponent(jPanel_direction, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE)
-//                .addComponent(jPanel_direction, 300, 300, 300)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
+                .addComponent(myJPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(100, 100, 100)
                 .addComponent(jButton1)
                 .addComponent(jButton2)
                 .addGap(86, 86, 86)
-//                .addComponent(jButtonSetCenter)
-//                .addGap(86, 86, 86)
                 .addComponent(jButtonLearn)
                 .addGap(86, 86, 86)
-//                .addComponent(jButtonPopUp)
-//                .addGap(86, 86, 86)
                 .addComponent(jButtonV1U)
                 .addComponent(jButtonV1D)
                 .addGap(86, 86, 86)
@@ -658,20 +667,19 @@ public class FdActivity extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                .addComponent(jPanel_direction, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                .addComponent(jPanel_direction, 300, 300, 300)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(myJPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    )
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
                     .addComponent(jButton2)
                     .addComponent(jButtonLearn)
-//                    .addComponent(jButtonSetCenter)
                     .addComponent(jButtonV1U)
                     .addComponent(jButtonV1D)
                     .addComponent(jButtonV2U)
                     .addComponent(jButtonV2D))
-//                .addComponent(jButtonPopUp)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -760,7 +768,6 @@ public class FdActivity extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel_direction;
     
     private javax.swing.JButton jButtonV1U;
     private javax.swing.JButton jButtonV1D;
@@ -770,8 +777,8 @@ public class FdActivity extends javax.swing.JFrame {
 
     private javax.swing.JButton jButtonLearn;
     
-//    private javax.swing.JButton jButtonSetCenter;
-//    private javax.swing.JButton jButtonPopUp;
+    //JPanel test
+    private javax.swing.JPanel myJPanel;
 
     // End of variables declaration//GEN-END:variables
 }
